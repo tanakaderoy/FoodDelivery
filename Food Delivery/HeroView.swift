@@ -9,22 +9,24 @@
 import SwiftUI
 
 struct HeroView: View {
+    @Environment(\.imageCache) var cache: ImageCache
+
     var data: HeroViewData
     var body: some View {
         HStack{
-            VStack {
+            VStack(alignment: .leading) {
                 Spacer()
                 Text(data.title.uppercased()).font(.largeTitle).foregroundColor(Color.white).multilineTextAlignment(.leading)
                 Text(data.cta.uppercased()).font(.title).foregroundColor(Color.white).multilineTextAlignment(.leading)
                 Spacer()
             }.padding(.leading, 16)
-            VStack{
-                Spacer()
-                Image(systemName: "play").scaledToFill()
-                    .frame(width: 100.0, height: 100.0)
-                Spacer()
-            }
             Spacer()
+            ZStack(alignment:.trailing){
+                AsyncImage(url: URL(string: data.image)!, placeholder: Text("Loading"), cache: cache, width: 200, height: 200).aspectRatio(contentMode: .fill)
+                Rectangle() .foregroundColor(.clear)        // Making rectangle transparent
+                    .background(LinearGradient(gradient: Gradient(colors: [data.backgroundColor,.clear]), startPoint: .leading, endPoint: .trailing))
+
+            }.padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
         }.background(data.backgroundColor)
     }
 }
@@ -52,12 +54,12 @@ struct HeroViewData {
     var title: String
     var cta: String
     var backgroundColor: Color
-    var image: String?
+    var image: String
 }
 
 
 struct HeroView_Previews: PreviewProvider {
     static var previews: some View {
-        HeroView(data: HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: nil))
+        HeroView(data: HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: "https://www.demandafrica.com/wp-content/uploads/2018/06/Nigerian-jollof.jpeg"))
     }
 }

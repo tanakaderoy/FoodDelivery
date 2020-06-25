@@ -9,7 +9,7 @@
 import SwiftUI
 
 class FoodController:  UICollectionViewController {
-    let heroData = [HeroViewData.init(title: "Grab Some Jollof", cta: "Save 30%", backgroundColor: .black, image: nil),HeroViewData.init(title: "Grab Some Burgers", cta: "Save 30%", backgroundColor: .purple, image: nil),HeroViewData.init(title: "Grab Some Ramen", cta: "Save 30%", backgroundColor: .yellow, image: nil),HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: nil)]
+    let heroData = [HeroViewData.init(title: "Grab Some Jollof", cta: "Save 30%", backgroundColor: .black, image: "https://www.demandafrica.com/wp-content/uploads/2018/06/Nigerian-jollof.jpeg"),HeroViewData.init(title: "Grab Some Burgers", cta: "Save 30%", backgroundColor: .purple, image: "https://timeincsecure-a.akamaihd.net/rtmp_uds/429048911/202004/2769/429048911_6152425885001_6152427053001-vs.jpg?pubId=429048911&videoId=6152427053001"),HeroViewData.init(title: "Grab Some Pasta", cta: "Save 30%", backgroundColor: .yellow, image: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/190305-lemon-garlic-asparagus-pasta-horizontal-161-1553190755.jpg"),HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: "https://www.nippon.com/en/ncommon/contents/japan-data/169591/169591.jpg")]
 
     private let cellID = "cellId"
     static let categoryHeaderId = "categoryHeaderId"
@@ -60,6 +60,9 @@ class FoodController:  UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let controller = UIViewController()
         controller.view.backgroundColor = indexPath.section == 0 ? .yellow : .blue
+        if indexPath.section == 0{
+            controller.title = heroData[indexPath.row].title
+        }
         navigationController?.pushViewController(controller, animated: true)
     }
 
