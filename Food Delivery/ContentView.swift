@@ -9,42 +9,175 @@
 import SwiftUI
 
 class FoodController:  UICollectionViewController {
+    let heroData = [HeroViewData.init(title: "Grab Some Jollof", cta: "Save 30%", backgroundColor: .black, image: nil),HeroViewData.init(title: "Grab Some Burgers", cta: "Save 30%", backgroundColor: .purple, image: nil),HeroViewData.init(title: "Grab Some Ramen", cta: "Save 30%", backgroundColor: .yellow, image: nil),HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: nil)]
 
     private let cellID = "cellId"
+    static let categoryHeaderId = "categoryHeaderId"
+    let headerID = "headerID"
+    let heroCellID = "heroCellId"
 
 
     init() {
         super.init(collectionViewLayout: FoodController.createLayout())
     }
 
-    static func createLayout() -> UICollectionViewCompositionalLayout {
-        return UICollectionViewCompositionalLayout { (sectionNumber, env) -> NSCollectionLayoutSection? in
-            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-            item.contentInsets.trailing = 16
-            item.contentInsets.bottom = 16
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(200)), subitems: [item])
-            let section = NSCollectionLayoutSection(group: group)
-            return section
-        }
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-        cell.backgroundColor = .red
-        return cell
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.backgroundColor = .white
         navigationItem.title = "Food Delivery"
+        collectionView.register(HostingCollectionViewCell.self, forCellWithReuseIdentifier: heroCellID)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellID)
+        collectionView.register(Header.self, forSupplementaryViewOfKind: FoodController.categoryHeaderId, withReuseIdentifier: headerID)    }
+
+
+
+
+
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 4
     }
 
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath)
+        return header
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch section {
+        case 0:
+            return heroData.count
+        case 1:
+            return 8
+        case 2:
+            return 4
+        case 3:
+            return 5
+        default:
+            return 0
+        }
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let controller = UIViewController()
+        controller.view.backgroundColor = indexPath.section == 0 ? .yellow : .blue
+        navigationController?.pushViewController(controller, animated: true)
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        switch indexPath.section{
+        case 0:
+            //Could use a custom object to hold title, call to action and image: Chipotle, save 10%, burrito.jpg etc
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: heroCellID, for: indexPath) as? HostingCollectionViewCell else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                           cell.backgroundColor = .green
+                return cell
+            }
+            cell.host(UIHostingController(rootView: HeroView(data: heroData[indexPath.row])))
+            cell.backgroundColor = indexPath.row % 2 == 0 ? .white : .red
+            return cell
+        case 1:
+            //categories custom object with name and image
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+            cell.backgroundColor = .magenta
+            return cell
+        case 2:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+            cell.backgroundColor = .blue
+            return cell
+        case 3:
+            //
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+            cell.backgroundColor = .green
+            return cell
+        default:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+            cell.backgroundColor = .white
+            return cell
+        }
+
+
+    }
+
+
+
+    static func createLayout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { (sectionNumber, env) -> NSCollectionLayoutSection? in
+            switch sectionNumber {
+            case 0:
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+                item.contentInsets.trailing = 2
+                item.contentInsets.bottom = 0
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(200)), subitems: [item])
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .paging
+                return section
+            case 1:
+                let item = NSCollectionLayoutItem(layoutSize:
+                    .init(widthDimension: .fractionalWidth(0.25),
+                          heightDimension: .absolute(150)))
+                item.contentInsets.trailing = 16
+                item.contentInsets.bottom = 16
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(500)), subitems: [item])
+
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets.leading = 16
+                section.boundarySupplementaryItems = [
+                    .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: categoryHeaderId, alignment: .topLeading)
+                ]
+                return section
+
+            case 2:
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
+                item.contentInsets.trailing = 32
+                item.contentInsets.bottom = 0
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(0.8), heightDimension: .absolute(125)), subitems: [item])
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.contentInsets.leading = 16
+
+                return section
+
+            case 3:
+
+                let item = NSCollectionLayoutItem(layoutSize:
+                    .init(widthDimension: .fractionalWidth(0.5),
+                          heightDimension: .absolute(300)))
+                item.contentInsets.trailing = 16
+                item.contentInsets.bottom = 16
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(1000)), subitems: [item])
+
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets.leading = 16
+                section.contentInsets.top = 16
+//                section.boundarySupplementaryItems = [
+//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: categoryHeaderId, alignment: .topLeading)
+//                ]
+                return section
+            default:
+                return nil
+            }
+
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+}
+
+class Header: UICollectionReusableView{
+    let label = UILabel()
+    override init(frame: CGRect) {
+        super.init(frame:frame)
+        label.text =  "Categories"
+
+        addSubview(label)
+    }
+
+    override func layoutSubviews() {
+        label.frame = bounds
+    }
 
 
     required init?(coder: NSCoder) {
@@ -55,7 +188,19 @@ class FoodController:  UICollectionViewController {
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        Container().edgesIgnoringSafeArea(.all)
+    }
+
+    struct Container: UIViewControllerRepresentable {
+        func makeUIViewController(context: Context) ->  UIViewController {
+            return UINavigationController(rootViewController: FoodController())
+        }
+
+        func updateUIViewController(_ uiViewController:  UIViewController, context: Context) {
+
+        }
+        typealias UIViewControllerType = UIViewController
+
     }
 }
 
