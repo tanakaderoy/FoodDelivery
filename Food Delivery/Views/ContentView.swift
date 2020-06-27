@@ -9,12 +9,15 @@
 import SwiftUI
 
 class FoodController:  UICollectionViewController {
-    let heroData = [HeroViewData.init(title: "Grab Some Jollof", cta: "Save 30%", backgroundColor: .black, image: "https://www.demandafrica.com/wp-content/uploads/2018/06/Nigerian-jollof.jpeg"),HeroViewData.init(title: "Grab Some Burgers", cta: "Save 30%", backgroundColor: .purple, image: "https://timeincsecure-a.akamaihd.net/rtmp_uds/429048911/202004/2769/429048911_6152425885001_6152427053001-vs.jpg?pubId=429048911&videoId=6152427053001"),HeroViewData.init(title: "Grab Some Pasta", cta: "Save 30%", backgroundColor: .yellow, image: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/190305-lemon-garlic-asparagus-pasta-horizontal-161-1553190755.jpg"),HeroViewData.init(title: "Grab Some Sushi", cta: "Save 30%", backgroundColor: .red, image: "https://www.nippon.com/en/ncommon/contents/japan-data/169591/169591.jpg")]
+
 
     private let cellID = "cellId"
     static let categoryHeaderId = "categoryHeaderId"
     let headerID = "headerID"
     let heroCellID = "heroCellId"
+    let categoryCellId = "categoryCellId"
+    let messageCellId = "messageeCellId"
+    let itemCellId = "itemCellId"
 
 
     init() {
@@ -23,11 +26,15 @@ class FoodController:  UICollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = UIColor(hexString: "#F4F3F4")
         navigationItem.title = "Food Delivery"
         collectionView.register(HostingCollectionViewCell.self, forCellWithReuseIdentifier: heroCellID)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellID)
-        collectionView.register(Header.self, forSupplementaryViewOfKind: FoodController.categoryHeaderId, withReuseIdentifier: headerID)    }
+        collectionView.register(Header.self, forSupplementaryViewOfKind: FoodController.categoryHeaderId, withReuseIdentifier: headerID)
+        collectionView.register(CategoryCollectionViewCell.nib(), forCellWithReuseIdentifier: categoryCellId)
+        collectionView.register(HostingCollectionViewCell.self, forCellWithReuseIdentifier: messageCellId)
+        collectionView.register(ItemCollectionViewCell.nib(), forCellWithReuseIdentifier: itemCellId)
+    }
 
 
 
@@ -38,8 +45,15 @@ class FoodController:  UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath)
+        if indexPath.section == 1{
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! Header
+        header.configure(with: "Category")
         return header
+        }
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! Header
+        header.configure(with: "Food")
+        return header
+
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -47,11 +61,11 @@ class FoodController:  UICollectionViewController {
         case 0:
             return heroData.count
         case 1:
-            return 8
+            return categoryData.count
         case 2:
-            return 4
+            return messageData.count
         case 3:
-            return 5
+            return itemData.count
         default:
             return 0
         }
@@ -60,8 +74,21 @@ class FoodController:  UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let controller = UIViewController()
         controller.view.backgroundColor = indexPath.section == 0 ? .yellow : .blue
-        if indexPath.section == 0{
-            controller.title = heroData[indexPath.row].title
+        switch indexPath.section {
+        case 0:
+                       controller.title = heroData[indexPath.row].title
+
+        case 1:
+                        controller.title = categoryData[indexPath.row].name
+
+        case 2:
+                        controller.title = messageData[indexPath.row].title
+
+        case 3:
+            controller.title = itemData[indexPath.row].itemName
+
+        default:
+            break
         }
         navigationController?.pushViewController(controller, animated: true)
     }
@@ -72,25 +99,42 @@ class FoodController:  UICollectionViewController {
             //Could use a custom object to hold title, call to action and image: Chipotle, save 10%, burrito.jpg etc
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: heroCellID, for: indexPath) as? HostingCollectionViewCell else {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-                           cell.backgroundColor = .green
+                cell.backgroundColor = .green
                 return cell
             }
             cell.host(UIHostingController(rootView: HeroView(data: heroData[indexPath.row])))
-            cell.backgroundColor = indexPath.row % 2 == 0 ? .white : .red
             return cell
         case 1:
             //categories custom object with name and image
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-            cell.backgroundColor = .magenta
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: categoryCellId, for: indexPath) as? CategoryCollectionViewCell else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                cell.backgroundColor = .green
+                return cell
+            }
+//            cell.host(UIHostingController(rootView: CategoryView(data: categoryData[indexPath.row])))
+            let data = categoryData[indexPath.row]
+            cell.configure(with: UIImage(named: data.image.rawValue)!, title: data.name)
+            cell.backgroundColor = .white
             return cell
         case 2:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-            cell.backgroundColor = .blue
-            return cell
+             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: messageCellId, for: indexPath) as? HostingCollectionViewCell else {
+                           let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                           cell.backgroundColor = .green
+                           return cell
+                       }
+                       cell.host(UIHostingController(rootView: MessageView(data: messageData[indexPath.row])))
+             cell.backgroundColor = .clear
+                       return cell
         case 3:
             //
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-            cell.backgroundColor = .green
+          guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: itemCellId, for: indexPath) as? ItemCollectionViewCell else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                cell.backgroundColor = .green
+                return cell
+            }
+          let data = itemData[indexPath.row]
+          cell.configure(with: UIImage(named: data.image.rawValue)!, itemName: data.itemName, subTitle: data.subTitlem, price: data.price, hotOrNot: data.hotOrNot)
+          cell.backgroundColor = .white
             return cell
         default:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
@@ -151,10 +195,10 @@ class FoodController:  UICollectionViewController {
 
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets.leading = 16
-                section.contentInsets.top = 16
-//                section.boundarySupplementaryItems = [
-//                    .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: categoryHeaderId, alignment: .topLeading)
-//                ]
+                section.contentInsets.top = 0
+                                section.boundarySupplementaryItems = [
+                                    .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: categoryHeaderId, alignment: .topLeading)
+                                ]
                 return section
             default:
                 return nil
@@ -176,6 +220,10 @@ class Header: UICollectionReusableView{
         label.text =  "Categories"
 
         addSubview(label)
+    }
+    func configure(with title:String){
+        label.font = .systemFont(ofSize: 24, weight: .medium)
+        label.text = title
     }
 
     override func layoutSubviews() {
