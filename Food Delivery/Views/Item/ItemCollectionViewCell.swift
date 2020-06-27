@@ -19,6 +19,10 @@ class ItemCollectionViewCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        subTitleLabel.textColor = .secondaryLabel
+        itemNameLabel.textColor = .label
+        priceLabel.textColor = .label
+
     }
 
     public func configure(with image: UIImage, itemName: String, subTitle: String, price:String, hotOrNot: String){

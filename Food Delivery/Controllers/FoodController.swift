@@ -28,7 +28,7 @@ class FoodController:  UICollectionViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.backgroundColor = UIColor(hexString: "#F4F3F4")
+        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .light ? UIColor(hexString: "#F4F3F4"): UIColor(hexString: "#212121")
         navigationItem.title = "Food Delivery"
         collectionView.register(HostingCollectionViewCell.self, forCellWithReuseIdentifier: heroCellID)
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellID)
@@ -116,7 +116,7 @@ class FoodController:  UICollectionViewController {
             //            cell.host(UIHostingController(rootView: CategoryView(data: categoryData[indexPath.row])))
             let data = categoryData[indexPath.row]
             cell.configure(with: UIImage(named: data.image.rawValue)!, title: data.name)
-            cell.backgroundColor = .white
+            cell.backgroundColor = .systemBackground
             return cell
         case 2:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: messageCellId, for: indexPath) as? HostingCollectionViewCell else {
@@ -136,7 +136,7 @@ class FoodController:  UICollectionViewController {
             }
             let data = itemData[indexPath.row]
             cell.configure(with: UIImage(named: data.image.rawValue)!, itemName: data.itemName, subTitle: data.subTitlem, price: data.price, hotOrNot: data.hotOrNot)
-            cell.backgroundColor = .white
+            cell.backgroundColor = .systemBackground
             return cell
         default:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
