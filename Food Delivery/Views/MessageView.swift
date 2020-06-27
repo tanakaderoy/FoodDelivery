@@ -21,7 +21,7 @@ struct MessageView: View {
             }.padding(.horizontal, 16)
             Spacer()
             Image(uiImage: UIImage(named: data.image.rawValue)!).padding(.leading, 10.0)
-            }.background(Color(UIColor(hexString: "#F4CC86"))).cornerRadius(10)
+        }.background(Color(UIColor(hexString: "#F4CC86"))).cornerRadius(10)
     }
 }
 
